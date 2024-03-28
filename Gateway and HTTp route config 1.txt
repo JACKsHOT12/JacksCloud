@@ -64,6 +64,11 @@ metadata:
   namespace: test-infra
   annotations:
     alb.networking.azure.io/alb-id: '/subscriptions/43d7845a-9ebd-41b7-8595-ecef5ca974c9/resourceGroups/JackTask-RG/providers/Microsoft.ServiceNetworking/trafficControllers/JacksAGC'
+##
+[NOTE- PLEASE REPLACE - '/subscriptions/43d7845a-9ebd-41b7-8595-ecef5ca974c9/resourceGroups/JackTask-RG/providers/Microsoft.ServiceNetworking/trafficControllers/JacksAGC'
+WITH YOUR RESPECTIVE SUBSCRIPTION ID , RESOUREC GROUP NAME & APPLICATION GATEWAY'S NAME]
+WHEN DONE DELETE FROM ## TO ##
+##
 spec:
   gatewayClassName: azure-alb-external
   listeners:
