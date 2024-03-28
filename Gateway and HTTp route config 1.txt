@@ -1,0 +1,95 @@
+#Deployment.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-infra
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-v1
+  namespace: test-infra
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: nginx-v1
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v1
+  namespace: test-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-v1
+  template:
+    metadata:
+      labels:
+        app: nginx-v1
+    spec:
+      containers:
+        - name: nginx-v1
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+
+--------------------------------------------------------------------------------------
+##Ignore
+ 
+RESOURCE_GROUP='JackTask-RG'
+RESOURCE_NAME='JacksAGC'
+
+RESOURCE_ID=$(az network alb show --resource-group $RESOURCE_GROUP --name $RESOURCE_NAME --query id -o tsv)
+FRONTEND_NAME='nginx-
+
+##Ignore 
+------------------------
+
+                                                                                                          
+#gateway.yaml
+   
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nginx-gw
+  namespace: test-infra
+  annotations:
+    alb.networking.azure.io/alb-id: '/subscriptions/43d7845a-9ebd-41b7-8595-ecef5ca974c9/resourceGroups/JackTask-RG/providers/Microsoft.ServiceNetworking/trafficControllers/JacksAGC'
+spec:
+  gatewayClassName: azure-alb-external
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+  addresses:
+  - type: alb.networking.azure.io/alb-frontend
+    value: 'nginx-frontend'
+
+------------------------
+
+#httproute.yaml
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: nginx-route
+  namespace: test-infra
+spec:
+  parentRefs:
+  - name: nginx-gw
+  rules:
+  - backendRefs:
+    - name: nginx-v1
+      port: 8080
